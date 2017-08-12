@@ -5,6 +5,7 @@ int RGB1red = 9;
 int RGB1green = 10;
 int RGB1blue = 11;
 int buttonPin = 2;
+int motorPin = 3;
 
 // Cycles
 int buttonState = 0;
@@ -17,7 +18,7 @@ int spectrum2;
 int spectrum3;
 int led;
 
-float breath;
+int breath;
 
 int c1;
 int c2;
@@ -33,7 +34,9 @@ void setup() {
   pinMode(RGB1green, OUTPUT);
   pinMode(RGB1blue, OUTPUT);
   pinMode(buttonPin, INPUT);
-  
+  pinMode(motorPin, OUTPUT);
+
+  analogWrite(motorPin, 70);
 }
 
 void loop() {
@@ -43,7 +46,7 @@ void loop() {
   buttonState = digitalRead(buttonPin);
   buttonCheck();
 
-
+  Serial.println(mode);
 
   // Spectrum Cycling (Mode 1)
   
@@ -116,7 +119,7 @@ void loop() {
       colourFade();
       breath = 0;
     }
-    if(breath >= 200){
+    if(breath >= 150){
       colourPicker2();
       setColor(spectrum1, spectrum2, spectrum3);
       delay(15);
@@ -126,7 +129,7 @@ void loop() {
       setColor(0, 0, 0);
       breath = 0;
     }
-    breath += 0.01;
+    breath ++;
     firstCycle = false;
   }
 }
@@ -236,7 +239,7 @@ void colourFade(){
 }
 
 void buttonCheck(){
-  if (buttonState == HIGH) {
+  if (buttonState == 1) {
     if (lastPress != buttonState){
       mode ++;
       firstCycle = true;
