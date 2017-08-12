@@ -35,8 +35,6 @@ void setup() {
   pinMode(RGB1blue, OUTPUT);
   pinMode(buttonPin, INPUT);
   pinMode(motorPin, OUTPUT);
-
-  analogWrite(motorPin, 70);
 }
 
 void loop() {
@@ -47,6 +45,11 @@ void loop() {
   buttonCheck();
 
   Serial.println(mode);
+  if(mode > 0){
+    analogWrite(motorPin, 255);
+  } else {
+    analogWrite(motorPin, 0);
+  }
 
   // Spectrum Cycling (Mode 1)
   
