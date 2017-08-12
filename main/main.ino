@@ -1,14 +1,15 @@
 int mode = 0;
 
+// Pins
 int RGB1red = 9;
 int RGB1green = 10;
 int RGB1blue = 11;
-
 int buttonPin = 2;
+
+// Cycles
 int buttonState = 0;
 int lastPress;
 
-// Cycle
 int firstCycle = true;
 
 int spectrum1;
@@ -16,7 +17,6 @@ int spectrum2;
 int spectrum3;
 int led;
 
-int colour;
 float breath;
 
 int c1;
@@ -37,21 +37,17 @@ void setup() {
 }
 
 void loop() {
+ 
+  // Changing Colour Modes and Button Input Checker
+  
   buttonState = digitalRead(buttonPin);
-  
-  if (buttonState == HIGH) {
-    if (lastPress != buttonState){
-      mode ++;
-      firstCycle = true;
-      if(mode >= 4){
-        mode = 0;
-      }
-    }
-  }
-  
-  lastPress = buttonState;
+  buttonCheck();
 
-  if (mode == 1){ // Spectrum Cycling
+
+
+  // Spectrum Cycling (Mode 1)
+  
+  if (mode == 1){
     if(firstCycle){
       colourFade();
       led = 1;
@@ -82,8 +78,10 @@ void loop() {
     delay(5);
 
 
+
+    // Breathing (Mode 2)
     
-  } else if (mode == 2) { // Breathing
+  } else if (mode == 2) {
     if(firstCycle){
       colourFade();
       led = 1;
@@ -110,14 +108,16 @@ void loop() {
    delay(7);
 
 
+
+   // Stars (Mode 3)
    
-  } else if (mode == 3) { // Stars
+  } else if (mode == 3) {
     if(firstCycle){
       colourFade();
       breath = 0;
     }
     if(breath >= 200){
-      colourPicker4();
+      colourPicker2();
       setColor(spectrum1, spectrum2, spectrum3);
       delay(15);
       spectrum1 = 0;
@@ -179,18 +179,6 @@ void colourPicker(){
 }
 
 void colourPicker2(){
-  c1 = random(0,256);
-  c2 = random(0,256);
-  c3 = random(0,256);
-}
-
-void colourPicker3(){
-  spectrum1 = random(0,256);
-  spectrum2 = random(0,256);
-  spectrum3 = random(0,256);
-}
-
-void colourPicker4(){
   pick = random(1,9);
   while(pick == lastPick){
     pick = random(1,9);
@@ -231,12 +219,6 @@ void colourPicker4(){
   } 
 }
 
-
-// Serial.println(spectrum1);
-// Serial.println(spectrum2);
-// Serial.println(spectrum3);
-// Serial.println("");
-
 void colourFade(){
   while(spectrum1 > 0 || spectrum2 > 0 || spectrum3 > 0){
         if(spectrum1 > 0){
@@ -251,5 +233,18 @@ void colourFade(){
         setColor(spectrum1, spectrum2, spectrum3);
         delay(2);
   }
+}
+
+void buttonCheck(){
+  if (buttonState == HIGH) {
+    if (lastPress != buttonState){
+      mode ++;
+      firstCycle = true;
+      if(mode >= 4){
+        mode = 0;
+      }
+    }
+  }
+  lastPress = buttonState;
 }
 
