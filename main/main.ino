@@ -1,3 +1,16 @@
+/*
+  RGB Spectacle
+
+  Controlls the lighting modes, rotation of motor and interprets inputs as different
+  colour modes and further settings.
+
+  The circuit:
+  - NA
+
+  created 10 Aug 2017
+  by David de Vigne
+*/
+
 int mode = 0;
 
 // Pins
@@ -46,12 +59,12 @@ void loop() {
  
   // Changing Colour Modes and Button Input Checker
   buttonState = readCapacitivePin(capSensePin); // Touch Sensor
-  //buttonState = digitalRead(buttonPin);
+  //buttonState = digitalRead(buttonPin); // Push Button
   buttonCheck();
 
-  Serial.println(mode);
+  //Serial.println(mode); // Debug
   if(mode > 0){
-    analogWrite(motorPin, 255);
+    analogWrite(motorPin, 150);
   } else {
     analogWrite(motorPin, 0);
   }
@@ -142,11 +155,15 @@ void loop() {
   }
 }
 
+// Function to set colour for led when called
+
 void setColor(int red, int green, int blue) {
   analogWrite(RGB1red, red);
   analogWrite(RGB1green, green);
   analogWrite(RGB1blue, blue);  
 }
+
+// Randomly select colour for use in the map function
 
 void colourPicker(){
   pick = random(1,9);
@@ -189,6 +206,8 @@ void colourPicker(){
   } 
 }
 
+// Randomly select colour
+
 void colourPicker2(){
   pick = random(1,9);
   while(pick == lastPick){
@@ -230,6 +249,8 @@ void colourPicker2(){
   } 
 }
 
+// Fade Colour when the colour mode is changed
+
 void colourFade(){
   while(spectrum1 > 0 || spectrum2 > 0 || spectrum3 > 0){
         if(spectrum1 > 0){
@@ -246,6 +267,8 @@ void colourFade(){
   }
 }
 
+// Check function to correctly cycle through colour modes
+
 void buttonCheck(){
   if (buttonState == 1) {
     if (lastPress != buttonState){
@@ -259,25 +282,17 @@ void buttonCheck(){
   lastPress = buttonState;
 }
 
-// readCapacitivePin
-//  Input: Arduino pin number
-//  Output: A number, from 0 to 17 expressing
-//          how much capacitance is on the pin
-//  When you touch the pin, or whatever you have
-//  attached to it, the number will get higher
-//  In order for this to work now,
-// The pin should have a 1+Megaohm resistor pulling
-//  it up to +5v.
+
+// This code was obtained and studied from, https://www.instructables.com/id/Turn-a-pencil-drawing-into-a-capacitive-sensor-for/
+// This function calulates the capacitance by the feild generated from the human touch and calculates wheather the return should be true or false
+// I did not write this myself, but used a tutorial to help understand how it is achieved
+
 uint8_t readCapacitivePin(int pinToMeasure){
-  // This is how you declare a variable which
-  //  will hold the PORT, PIN, and DDR registers
-  //  on an AVR
+
   volatile uint8_t* port;
   volatile uint8_t* ddr;
   volatile uint8_t* pin;
-  // Here we translate the input pin number from
-  //  Arduino pin number to the AVR PORT, PIN, DDR,
-  //  and which bit of those registers we care about.
+
   byte bitmask;
   if ((pinToMeasure >= 0) && (pinToMeasure <= 7)){
     port = &PORTD;
@@ -311,12 +326,6 @@ uint8_t readCapacitivePin(int pinToMeasure){
       break;
     }
   }
-  // Discharge the pin again by setting it low and output
-  //  It's important to leave the pins low if you want to 
-  //  be able to touch more than 1 sensor at a time - if
-  //  the sensor is left pulled high, when you touch
-  //  two sensors, your body will transfer the charge between
-  //  sensors.
   *port &= ~(bitmask);
   *ddr  |= bitmask;
   
