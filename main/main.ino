@@ -1,8 +1,7 @@
 /*
   RGB Spectacle
 
-  Controlls the lighting modes, rotation of motor and interprets inputs as different
-  colour modes and further settings.
+  Controlls the lighting modes, and interprets sound for further interaction.
 
   The circuit:
   - NA
@@ -17,8 +16,8 @@ int mode = 0;
 int RGB1red = 9;
 int RGB1green = 10;
 int RGB1blue = 11;
-int buttonPin = 2;
-int motorPin = 3;
+int touchPin = 5;
+int soundPin = 0;
 
 // Cycles
 int buttonState = 0;
@@ -40,9 +39,11 @@ int c3;
 int lastPick;
 int pick;
 
-//Touch Sensor Setup
-int capSensePin = 5;
+// Touch Sensor Setup
 int touchedCutoff = 60;
+
+// Sound Setup
+int soundLevel = 250;
 
 void setup() {
   Serial.begin(9600);
@@ -51,23 +52,20 @@ void setup() {
   pinMode(RGB1green, OUTPUT);
   pinMode(RGB1blue, OUTPUT);
   pinMode(buttonPin, INPUT);
-  pinMode(motorPin, OUTPUT);
+  pinMode(soundPin, INPUT);
 }
 
 void loop() {
-  Serial.println(readCapacitivePin(capSensePin));
  
-  // Changing Colour Modes and Button Input Checker
-  buttonState = readCapacitivePin(capSensePin); // Touch Sensor
-  //buttonState = digitalRead(buttonPin); // Push Button
-  buttonCheck();
+	// Turn off system when sound level is exceded
+	if(analogRead(soundPin) > soundLevel){
+		mode = 0;
+		firstCycle  = true;
+	}
 
-  //Serial.println(mode); // Debug
-  if(mode > 0){
-    analogWrite(motorPin, 150);
-  } else {
-    analogWrite(motorPin, 0);
-  }
+  // Changing Colour Modes and Button Input Checker
+
+  buttonCheck();
 
   // Spectrum Cycling (Mode 1)
   
@@ -270,8 +268,9 @@ void colourFade(){
 // Check function to correctly cycle through colour modes
 
 void buttonCheck(){
-  if (buttonState == 1) {
-    if (lastPress != buttonState){
+	buttonState = readCapacitivePin(touchPin);
+  if (buttonState > 0) {
+    if (lastPress != buttonState && lastPress == 0){
       mode ++;
       firstCycle = true;
       if(mode >= 4){
